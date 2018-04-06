@@ -24,7 +24,7 @@
 
 4PM Prize hand outs (you don't want to miss this) and cleanup (need volunteers)
 
-Sponsors:
+**Sponsors:**
 
 Food and Swag - Microsoft
 
