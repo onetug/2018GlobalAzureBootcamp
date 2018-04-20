@@ -73,7 +73,7 @@
 
 5. Add config setting for web project to use Azure Storage emulator locally. Note: when you deploy to live, replace this setting with the live keys
 
-**to-do: add web.config key**
+[!code-cshtml[Web.Config](https://github.com/onetug/2018GlobalAzureBootcamp/blob/f22a5b2c7cdbaad30c869c51d884104d10d0465b/SelfGuidedLab/WebApplication1/WebApplication1/Web.config?highlight=12)]
 
 6. Add the form to handle the upload Upload.cshtml under Views->Home folder
 
