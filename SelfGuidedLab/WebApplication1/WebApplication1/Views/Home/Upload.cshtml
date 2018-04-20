@@ -1,0 +1,16 @@
+﻿
+@using (Html.BeginForm("Upload", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <input type="file" name="file" id="file" />
+    <input type="submit" />
+}
+
+@if (!string.IsNullOrEmpty(ViewBag.Original))
+{
+    <p><img src="@ViewBag.Original" /></p>
+}
+
+@if (!string.IsNullOrEmpty(ViewBag.Output))
+{
+    <p><img src="@ViewBag.Output" /></p>
+}
