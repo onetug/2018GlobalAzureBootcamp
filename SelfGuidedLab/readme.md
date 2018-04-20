@@ -86,7 +86,7 @@
 
 3. Modify the Function method as shown
 
-        const string subscriptionKey = "afc85a64f45143a3aaf55cb28e55f1f8";
+        const string subscriptionKey = "subscription key here";
         //uri for the vision api
         const string uriBase = "https://eastus.api.cognitive.microsoft.com/vision/v1.0/generateThumbnail";
 
