@@ -23,6 +23,7 @@
 
 **Web Project**
 1. Create an ASP.NET MVC Web Application and add nuget the following packages: *Microsoft.WindowsAzure.ConfigurationManager* and *WindowsAzure.Storage*
+
 2. Go to HomeController and add an Upload Get action
 
         public ActionResult Upload(string fileName)
@@ -72,11 +73,126 @@
 
 5. Add config setting for web project to use Azure Storage emulator locally. Note: when you deploy to live, replace this setting with the live keys
 
-
+**to-do: add web.config key**
 
 6. Add the form to handle the upload Upload.cshtml under Views->Home folder
 
+**to-do: add cshtml code**
 
+**Azure Function project**
+1. Create New Azure Function project File->New->Project->Cloud->Azure Function. Allow any CLI installations that may pop up.
+
+2. Add a Function with Blob Trigger and call is CreateThumbnail
+
+3. Modify the Function method as shown
+
+        const string subscriptionKey = "afc85a64f45143a3aaf55cb28e55f1f8";
+        //uri for the vision api
+        const string uriBase = "https://eastus.api.cognitive.microsoft.com/vision/v1.0/generateThumbnail";
+
+        [FunctionName("CreateThumbnail")]
+        public static void Run([BlobTrigger("original/{name}", Connection = "AzureWebJobsStorage")]Stream original, string name, TraceWriter log,
+            [Blob("output/{name}", FileAccess.Write, Connection = "AzureWebJobsStorage")] Stream thumbnail,
+            [DocumentDB(
+            "photoDB",
+            "photoCollection",
+            CreateIfNotExists = true,
+            CollectionThroughput = 400,
+            Id = "Id",
+            ConnectionStringSetting = "photos")] ICollector<dynamic> outputDocument)
+        {
+            //
+            //
+            log.Info($"C# Blob trigger function Processed blob\n Name:{name} \n Size: {original.Length} Bytes");
+            var result = MakeThumbNailRequest(original);
+            result.Wait();
+            thumbnail.Write(result.Result, 0, result.Result.Length);
+            outputDocument.Add((dynamic)new { name = name, originalsize = original.Length, newsize = result.Result.Length });
+        }
+
+4. Add the following methods inside the function static class
+
+        /// <summary>
+        /// Gets a thumbnail image from the specified image file by using the Computer Vision REST API.
+        /// </summary>
+        /// <param name="imageFilePath">The image file to use to create the thumbnail image.</param>
+        static async Task<byte[]> MakeThumbNailRequest(Stream stream)
+        {
+            HttpClient client = new HttpClient();
+
+            // Request headers.
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
+
+            // Request parameters.
+            string requestParameters = "width=200&height=150&smartCropping=true";
+
+            // Assemble the URI for the REST API Call.
+            string uri = uriBase + "?" + requestParameters;
+
+            HttpResponseMessage response;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                stream.CopyTo(ms);
+                using (ByteArrayContent content = new ByteArrayContent(ms.ToArray()))
+                {
+                    // This example uses content type "application/octet-stream".
+                    // The other content types you can use are "application/json" and "multipart/form-data".
+                    content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+
+                    // Execute the REST API call.
+                    response = await client.PostAsync(uri, content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        // Display the response data.
+
+                        // Get the image data.
+                        return await response.Content.ReadAsByteArrayAsync();
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the contents of the specified file as a byte array.
+        /// </summary>
+        /// <param name="imageFilePath">The image file to read.</param>
+        /// <returns>The byte array of the image data.</returns>
+        static byte[] GetImageAsByteArray(string imageFilePath)
+        {
+            FileStream fileStream = new FileStream(imageFilePath, FileMode.Open, FileAccess.Read);
+            BinaryReader binaryReader = new BinaryReader(fileStream);
+            return binaryReader.ReadBytes((int)fileStream.Length);
+        }
+
+5. Add a Function with Blob Trigger and call is CosmosTrigger
+
+6. Modify the Function method as shown
+
+        [FunctionName("CosmosTrigger")]
+        public static void Run([CosmosDBTrigger(
+            databaseName: "photoDB",
+            collectionName: "photoCollection",
+            ConnectionStringSetting = "photos",
+            CreateLeaseCollectionIfNotExists =true,
+            LeaseCollectionName = "leases")]IReadOnlyList<Document> input, TraceWriter log)
+        {
+            if (input != null && input.Count > 0)
+            {
+                if ( (((dynamic)input[0]).originalsize/ ((dynamic)input[0]).newsize) > 20)
+                {
+                    log.Verbose("Great job thumbnailing");
+                }
+                log.Verbose("Documents modified " + input.Count);
+                log.Verbose("First document Id " + input[0].Id);
+            }
+        }
+
+7. Modify local.settings.json file
 
 
 
