@@ -1,6 +1,6 @@
 # 2018 Global Azure Bootcamp - Orlando
 
-*Tentative* **Schedule:**
+**Schedule:**
 
 8:00AM Setup (if you want to volunteer help, arrive at the venue at 8am)
 
@@ -8,7 +8,7 @@
 
 8:30AM-9:10AM Santosh Hari - "Basics of Azure and tips on getting started"
 
-9:15AM-10:05AM Esteban Garcia - topic TBD
+9:15AM-10:05AM Esteban Garcia - "Azure Deployment Automation"
 
 10:10AM-11:00AM Jared Porcenaluk - "Intro to IoT on Azure"
 
@@ -32,8 +32,12 @@ Location - Nebbia Tech
 
 Organizers - ONETUG
 
-Books - Manning Publication
+Free Licenses - Jetbrains
 
-Swag - Jetbrains
+Free Licenses - Progress Telerik
+
+Free Licenses - RevDeBug
 
 Swag - Elmah.io
+
+Books - Manning Publication
